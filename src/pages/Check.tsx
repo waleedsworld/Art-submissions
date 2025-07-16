@@ -18,7 +18,7 @@ interface ImageDisplay {
 
 const Check = () => {
   useEffect(() => {
-    document.title = "Check Submissions - LGS JTI ART SUBMISSIONS";
+    document.title = "Check Submissions - Art Submissions";
   }, []);
 
   const [displayedImages, setDisplayedImages] = useState<ImageDisplay[]>([]);
