@@ -6,6 +6,7 @@ import { Plus, Image, Star, Award, Rocket, CheckCircle, Wand2, ChevronLeft, Chev
 import { api } from "@/lib/api";
 import { parseImageData } from "@/lib/utils";
 import type { ImageRecord } from "@/types/api";
+import Footer from "@/components/Footer";
 import useEmblaCarousel from 'embla-carousel-react';
 import {
   Dialog,
@@ -245,7 +246,7 @@ const Index = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "LGS JTI ART SUBMISSIONS";
+    document.title = "Art Submissions";
   }, []);
 
   useEffect(() => {
@@ -492,32 +493,7 @@ const Index = () => {
         </div>
       )}
 
-      {/* Type Selection Dialog - This dialog is already defined above and will work for both buttons */}
-      <Dialog open={showTypeDialog} onOpenChange={setShowTypeDialog}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogTitle>Select Artwork Type</DialogTitle>
-          <DialogDescription>
-            Please specify the type of artwork you're submitting
-          </DialogDescription>
-          
-          <div className="grid gap-4 py-4">
-            <Button
-              onClick={() => handleTypeSelection("ai")}
-              variant="outline"
-              className="w-full"
-            >
-              AI Generated Art
-            </Button>
-            <Button
-              onClick={() => handleTypeSelection("handdrawn")}
-              variant="outline"
-              className="w-full"
-            >
-              Hand Drawn Art
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <Footer />
     </div>
   );
 };
