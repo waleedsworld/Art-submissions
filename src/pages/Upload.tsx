@@ -6,17 +6,20 @@ import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
-import { ArrowLeft } from "lucide-react";
+import Footer from "@/components/Footer";
+import { ArrowLeft, ImagePlus, X } from "lucide-react";
 
 const Upload = () => {
   const [searchParams] = useSearchParams();
   const initialType = searchParams.get("type") as "ai" | "handdrawn" | null;
 
   useEffect(() => {
-    document.title = "Upload Artwork - LGS JTI ART SUBMISSIONS";
+    document.title = "Upload Artwork - Art Submissions";
   }, []);
 
   const [image, setImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [studentName, setStudentName] = useState("");
   const [grade, setGrade] = useState("");
   const [title, setTitle] = useState("");
@@ -84,21 +87,41 @@ const Upload = () => {
     }
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      if (!selectedFile.type.startsWith('image/')) {
-        toast({
-          title: "Invalid File Type",
-          description: "Please select a valid image file",
-          variant: "destructive",
-        });
-        e.target.value = '';
-        return;
-      }
-      setImage(selectedFile);
+  // Keep a live object URL for the preview and revoke it when the file changes.
+  useEffect(() => {
+    if (!image) {
+      setPreviewUrl(null);
+      return;
     }
+    const url = URL.createObjectURL(image);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [image]);
+
+  const acceptFile = (selectedFile: File | undefined | null) => {
+    if (!selectedFile) return;
+    if (!selectedFile.type.startsWith("image/")) {
+      toast({
+        title: "Invalid File Type",
+        description: "Please select a valid image file",
+        variant: "destructive",
+      });
+      return;
+    }
+    setImage(selectedFile);
   };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    acceptFile(e.target.files?.[0]);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    acceptFile(e.dataTransfer.files?.[0]);
+  };
+
+  const clearImage = () => setImage(null);
 
   if (!submissionType) {
     return null;
@@ -196,12 +219,53 @@ const Upload = () => {
               <label className="block text-sm font-medium text-gray-200 mb-2">
                 Upload Image
               </label>
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="w-full"
-              />
+
+              {previewUrl ? (
+                <div className="relative rounded-xl overflow-hidden border border-white/10">
+                  <img
+                    src={previewUrl}
+                    alt="Selected artwork preview"
+                    className="w-full max-h-80 object-contain bg-black/40"
+                  />
+                  <button
+                    type="button"
+                    onClick={clearImage}
+                    aria-label="Remove selected image"
+                    className="absolute top-3 right-3 inline-flex items-center justify-center w-9 h-9 rounded-full bg-black/70 text-white hover:bg-black/90 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                  <p className="px-4 py-2 text-xs text-gray-400 truncate">
+                    {image?.name}
+                  </p>
+                </div>
+              ) : (
+                <label
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={handleDrop}
+                  className={`flex flex-col items-center justify-center gap-3 w-full rounded-xl border-2 border-dashed px-6 py-10 cursor-pointer transition-colors ${
+                    isDragging
+                      ? "border-primary bg-primary/10"
+                      : "border-white/15 hover:border-primary/60 hover:bg-white/5"
+                  }`}
+                >
+                  <ImagePlus className="h-8 w-8 text-primary" />
+                  <span className="text-sm text-gray-300 text-center">
+                    <span className="text-primary font-medium">Click to browse</span> or drag &amp; drop
+                  </span>
+                  <span className="text-xs text-gray-500">PNG, JPG or GIF — one masterpiece at a time</span>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+              )}
             </div>
 
             <Button
@@ -214,6 +278,7 @@ const Upload = () => {
           </form>
         </motion.div>
       </div>
+      <Footer />
     </div>
   );
 };
