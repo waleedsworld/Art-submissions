@@ -35,10 +35,19 @@
   
   body {
     @apply bg-background text-foreground antialiased;
-    background-image: url('/lovable-uploads/83a07bc7-28ab-40a3-93d3-763dcdaaf4cb.png');
+    /* Hand-built layered gradient "studio" backdrop — no external assets, renders
+       crisply on every screen and degrades gracefully on low-power devices. */
+    background-color: #0a0a0a;
+    background-image:
+      radial-gradient(60rem 60rem at 12% -10%, hsl(0 72% 51% / 0.18), transparent 60%),
+      radial-gradient(48rem 48rem at 105% 8%, hsl(28 90% 55% / 0.12), transparent 55%),
+      radial-gradient(70rem 70rem at 50% 120%, hsl(280 60% 45% / 0.10), transparent 60%),
+      linear-gradient(180deg, #0d0d0f 0%, #0a0a0a 45%, #0c0b0e 100%);
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
+    background-repeat: no-repeat;
+    min-height: 100vh;
   }
 
   html {
