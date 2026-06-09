@@ -97,6 +97,20 @@ That `dist/` folder is a plain static bundle — drop it on Cloudflare Pages, Ne
 
 ---
 
+## 🧪 Tests
+
+The project ships with a [Vitest](https://vitest.dev/) suite (jsdom + Testing Library) covering the API client, submission-metadata parsing, and shared UI.
+
+```bash
+npm test            # run the suite once
+npm run test:watch  # re-run on change while developing
+npm run test:coverage
+```
+
+Tests live next to the code they exercise as `*.test.ts` / `*.test.tsx` files.
+
+---
+
 ## 🔌 The backend
 
 The gallery talks to an image-processing API (upload, list, fetch-by-id, mark-approved) configured in **`src/lib/api.ts`** via `API_BASE_URL`. Point that constant at your own backend to wire up live submissions. The front-end degrades gracefully when the API is unavailable — the gallery simply shows its empty state, so you can develop and demo the UI without a server running.
