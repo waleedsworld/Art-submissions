@@ -125,6 +125,8 @@ const ArtworkGrid = ({ submissions, title }: { submissions: ImageRecord[], title
                   <img
                     src={api.getImageById(submission.id)}
                     alt={details.title}
+                    loading="lazy"
+                    decoding="async"
                     className="object-cover w-full h-full transform transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -414,6 +416,8 @@ const Index = () => {
                   <img
                     src={artwork.imageUrl}
                     alt={artwork.title}
+                    loading="lazy"
+                    decoding="async"
                     className="object-cover w-full h-full transform transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
