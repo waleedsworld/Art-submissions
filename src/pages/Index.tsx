@@ -124,7 +124,9 @@ const ArtworkGrid = ({ submissions, title }: { submissions: ImageRecord[], title
                 <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
                   <img
                     src={api.getImageById(submission.id)}
-                    alt={details.title}
+                    alt={details.title || "Student artwork"}
+                    loading="lazy"
+                    onError={(e) => { e.currentTarget.src = "/placeholder.svg"; }}
                     className="object-cover w-full h-full transform transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -156,6 +158,7 @@ const ArtworkGrid = ({ submissions, title }: { submissions: ImageRecord[], title
           <Button
             variant="ghost"
             size="icon"
+            aria-label="Show previous artworks"
             className="h-8 w-8 rounded-full bg-black/50 text-white hover:bg-black/70"
             onClick={() => {
               if (emblaApi) emblaApi.scrollPrev();
@@ -166,6 +169,7 @@ const ArtworkGrid = ({ submissions, title }: { submissions: ImageRecord[], title
           <Button
             variant="ghost"
             size="icon"
+            aria-label="Show next artworks"
             className="h-8 w-8 rounded-full bg-black/50 text-white hover:bg-black/70"
             onClick={() => {
               if (emblaApi) emblaApi.scrollNext();
@@ -183,7 +187,8 @@ const ArtworkGrid = ({ submissions, title }: { submissions: ImageRecord[], title
             <div className="relative">
               <img
                 src={api.getImageById(selectedImage.id)}
-                alt={parseImageData(selectedImage.datefield).title}
+                alt={parseImageData(selectedImage.datefield).title || "Student artwork"}
+                onError={(e) => { e.currentTarget.src = "/placeholder.svg"; }}
                 className="w-full h-full object-contain max-h-[80vh]"
               />
               
@@ -192,6 +197,7 @@ const ArtworkGrid = ({ submissions, title }: { submissions: ImageRecord[], title
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label="Previous artwork"
                   className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70 disabled:opacity-50"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -204,6 +210,7 @@ const ArtworkGrid = ({ submissions, title }: { submissions: ImageRecord[], title
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label="Next artwork"
                   className="h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70 disabled:opacity-50"
                   onClick={(e) => {
                     e.stopPropagation();
