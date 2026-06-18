@@ -2,7 +2,8 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plus, Image, Star, Award, Rocket, CheckCircle, Wand2, ChevronLeft, ChevronRight, ArrowRight, Loader2 } from "lucide-react";
+import { Plus, Image, Star, Award, Rocket, CheckCircle, Wand2, ChevronLeft, ChevronRight, ArrowRight, Loader2, Search, X, Download } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
 import { parseImageData } from "@/lib/utils";
 import type { ImageRecord } from "@/types/api";
@@ -53,6 +54,26 @@ const features = [{
   description: "Your art can inspire fellow students to create"
 }];
 
+// Feature: gallery search. Match a submission against a free-text query by
+// looking across its title, student name, grade and (for AI pieces) the
+// generator/prompt metadata so visitors can find a specific artwork fast.
+const submissionMatchesQuery = (submission: ImageRecord, query: string): boolean => {
+  const trimmed = query.trim().toLowerCase();
+  if (!trimmed) return true;
+  const details = parseImageData(submission.datefield);
+  const haystack = [
+    details.title,
+    details.studentName,
+    details.grade,
+    details.aiGenerator,
+    details.aiPrompt,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  return haystack.includes(trimmed);
+};
+
 const LoadingScreen = () => (
   <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
     <div className="text-center">
@@ -90,6 +111,44 @@ const ArtworkGrid = ({ submissions, title }: { submissions: ImageRecord[], title
     if (selectedIndex > 0) {
       setSelectedIndex(selectedIndex - 1);
       setSelectedImage(submissions[selectedIndex - 1]);
+    }
+  };
+
+  // Feature: keyboard navigation for the lightbox. Left/right arrows step
+  // through the currently open collection; the Dialog itself handles Escape.
+  useEffect(() => {
+    if (!selectedImage) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        handleNext();
+      } else if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        handlePrevious();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // handleNext/handlePrevious close over selectedIndex, so re-bind on change.
+  }, [selectedImage, selectedIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Feature: let visitors save the artwork they are viewing. We fetch the image
+  // as a blob so the download works cross-origin instead of just navigating.
+  const handleDownload = async (submission: ImageRecord) => {
+    const details = parseImageData(submission.datefield);
+    try {
+      const response = await fetch(api.getImageById(submission.id));
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = `${details.title || "artwork"}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(objectUrl);
+    } catch (error) {
+      console.error("Failed to download artwork:", error);
     }
   };
 
@@ -187,6 +246,20 @@ const ArtworkGrid = ({ submissions, title }: { submissions: ImageRecord[], title
                 className="w-full h-full object-contain max-h-[80vh]"
               />
               
+              {/* Download the currently viewed artwork */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 z-10 h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDownload(selectedImage);
+                }}
+                title="Download artwork"
+              >
+                <Download className="h-5 w-5" />
+              </Button>
+
               {/* Navigation Buttons */}
               <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4">
                 <Button
@@ -243,7 +316,16 @@ const Index = () => {
   const [competitionWinners, setCompetitionWinners] = useState<ImageRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [showTypeDialog, setShowTypeDialog] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+
+  // Feature: derive the visible collections from the live search query so every
+  // gallery section reacts to the same search box.
+  const filteredWinners = competitionWinners.filter((s) => submissionMatchesQuery(s, searchQuery));
+  const filteredAi = aiSubmissions.filter((s) => submissionMatchesQuery(s, searchQuery));
+  const filteredHandDrawn = handDrawnSubmissions.filter((s) => submissionMatchesQuery(s, searchQuery));
+  const hasSearch = searchQuery.trim().length > 0;
+  const totalMatches = filteredWinners.length + filteredAi.length + filteredHandDrawn.length;
 
   useEffect(() => {
     document.title = "Art Submissions";
@@ -433,8 +515,49 @@ const Index = () => {
         </div>
       </motion.section>
 
+      {/* Gallery Search Bar — filters every live gallery section below */}
+      {(aiSubmissions.length > 0 || handDrawnSubmissions.length > 0) && (
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="relative z-10 px-6 pt-16 pb-4"
+        >
+          <div className="max-w-6xl mx-auto">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+              <Input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search artworks by title, artist, grade or prompt…"
+                aria-label="Search artworks"
+                className="pl-12 pr-12 h-12 bg-black/40 border-white/15 text-white placeholder:text-gray-500"
+              />
+              {hasSearch && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  aria-label="Clear search"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
+            </div>
+            {hasSearch && (
+              <p className="mt-3 text-sm text-gray-400">
+                {totalMatches === 0
+                  ? "No artworks match your search."
+                  : `Showing ${totalMatches} matching ${totalMatches === 1 ? "artwork" : "artworks"}.`}
+              </p>
+            )}
+          </div>
+        </motion.section>
+      )}
+
       {/* Competition Winners Section */}
-      {competitionWinners.length > 0 && (
+      {filteredWinners.length > 0 && (
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -442,14 +565,14 @@ const Index = () => {
           className="relative z-10 px-6 py-16"
         >
           <ArtworkGrid
-            submissions={competitionWinners}
+            submissions={filteredWinners}
             title="Competition Winners"
           />
         </motion.section>
       )}
 
       {/* AI Submissions Section */}
-      {aiSubmissions.length > 0 && (
+      {filteredAi.length > 0 && (
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -457,14 +580,14 @@ const Index = () => {
           className="relative z-10 px-6 py-16 bg-black/30"
         >
           <ArtworkGrid
-            submissions={aiSubmissions}
+            submissions={filteredAi}
             title="AI Generated Artworks"
           />
         </motion.section>
       )}
 
       {/* Hand Drawn Submissions Section */}
-      {handDrawnSubmissions.length > 0 && (
+      {filteredHandDrawn.length > 0 && (
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -472,7 +595,7 @@ const Index = () => {
           className="relative z-10 px-6 py-16"
         >
           <ArtworkGrid
-            submissions={handDrawnSubmissions}
+            submissions={filteredHandDrawn}
             title="Hand Drawn Artworks"
           />
         </motion.section>
