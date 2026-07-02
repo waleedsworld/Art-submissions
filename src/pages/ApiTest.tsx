@@ -150,13 +150,14 @@ const ApiTestPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
+    <div className="min-h-screen w-full text-white p-4 sm:p-8">
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70 -z-10" />
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">API Test Dashboard</h1>
 
         <div className="grid gap-8">
           {/* Get Images Section */}
-          <div className="bg-gray-800 rounded-lg p-6">
+          <div className="glass rounded-xl p-6">
             <h2 className="text-xl font-semibold mb-4">Get Images</h2>
             <div className="flex gap-4 flex-wrap">
               <Button
@@ -192,7 +193,7 @@ const ApiTestPage = () => {
           </div>
 
           {/* Get Unmarked Image Section */}
-          <div className="bg-gray-800 rounded-lg p-6">
+          <div className="glass rounded-xl p-6">
             <h2 className="text-xl font-semibold mb-4">Get Unmarked Image</h2>
             <Button
               onClick={testGetUnmarked}
@@ -205,7 +206,7 @@ const ApiTestPage = () => {
           </div>
 
           {/* View Image by ID Section */}
-          <div className="bg-gray-800 rounded-lg p-6">
+          <div className="glass rounded-xl p-6">
             <h2 className="text-xl font-semibold mb-4">View Image by ID</h2>
             <div className="flex gap-4 items-end">
               <div className="flex-1">
@@ -214,7 +215,6 @@ const ApiTestPage = () => {
                   placeholder="Enter Image ID"
                   value={viewImageId}
                   onChange={(e) => setViewImageId(e.target.value)}
-                  className="bg-gray-700 border-gray-600"
                 />
               </div>
               <Button
@@ -227,11 +227,11 @@ const ApiTestPage = () => {
               </Button>
             </div>
             {previewUrl && (
-              <div className="mt-4 border border-gray-700 rounded-lg overflow-hidden">
+              <div className="mt-4 border border-white/10 rounded-lg overflow-hidden">
                 <img 
                   src={previewUrl} 
                   alt="Preview" 
-                  className="w-full h-auto max-h-[300px] object-contain bg-gray-700"
+                  className="w-full h-auto max-h-[300px] object-contain bg-black/40"
                   onError={() => {
                     toast({
                       title: "Error",
@@ -246,7 +246,7 @@ const ApiTestPage = () => {
           </div>
 
           {/* Mark Image Section */}
-          <div className="bg-gray-800 rounded-lg p-6">
+          <div className="glass rounded-xl p-6">
             <h2 className="text-xl font-semibold mb-4">Mark Image</h2>
             <div className="flex gap-4 items-end">
               <div className="flex-1">
@@ -255,7 +255,6 @@ const ApiTestPage = () => {
                   placeholder="Enter Image ID"
                   value={imageId}
                   onChange={(e) => setImageId(e.target.value)}
-                  className="bg-gray-700 border-gray-600"
                 />
               </div>
               <Button
@@ -280,7 +279,7 @@ const ApiTestPage = () => {
           </div>
 
           {/* Upload Image Section */}
-          <div className="bg-gray-800 rounded-lg p-6">
+          <div className="glass rounded-xl p-6">
             <h2 className="text-xl font-semibold mb-4">Upload Image</h2>
             <div className="flex gap-4 items-end">
               <div className="flex-1">
@@ -302,7 +301,6 @@ const ApiTestPage = () => {
                       setFile(selectedFile);
                     }
                   }}
-                  className="bg-gray-700 border-gray-600"
                   accept="image/*"
                 />
               </div>
@@ -318,11 +316,11 @@ const ApiTestPage = () => {
           </div>
 
           {/* Response Log Section */}
-          <div className="bg-gray-800 rounded-lg p-6">
+          <div className="glass rounded-xl p-6">
             <h2 className="text-xl font-semibold mb-4">Response Log</h2>
             <div className="space-y-4">
               {responses.map((response, index) => (
-                <div key={index} className="bg-gray-700 rounded p-4">
+                <div key={index} className="bg-black/40 border border-white/10 rounded-lg p-4">
                   <div className="font-mono text-sm text-green-400 mb-2">
                     {response.endpoint}
                   </div>

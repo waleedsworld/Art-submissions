@@ -146,15 +146,16 @@ const Check = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
+    <div className="min-h-screen w-full text-white p-4 sm:p-8">
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70 -z-10" />
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Image Review Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-8 text-white">Image Review Dashboard</h1>
 
         <div className="grid gap-8">
           {/* Controls Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Filter Controls */}
-            <div className="bg-gray-800 rounded-lg p-6">
+            <div className="glass rounded-xl p-6">
               <h2 className="text-xl font-semibold mb-4">Filter Images</h2>
               <div className="flex gap-4 flex-wrap">
                 <Button
@@ -198,14 +199,14 @@ const Check = () => {
             </div>
 
             {/* Upload Section */}
-            <div className="bg-gray-800 rounded-lg p-6">
+            <div className="glass rounded-xl p-6">
               <h2 className="text-xl font-semibold mb-4">Upload New Image</h2>
               <div className="flex gap-4 items-end">
                 <div className="flex-1">
                   <Input
                     type="file"
+                    aria-label="Select an image file to upload"
                     onChange={(e) => setFile(e.target.files?.[0] || null)}
-                    className="bg-gray-700 border-gray-600"
                     accept="image/*"
                   />
                 </div>
@@ -224,15 +225,16 @@ const Check = () => {
           {/* Images Display Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayedImages.map((image) => (
-              <div key={image.id} className="bg-gray-800 rounded-lg overflow-hidden">
+              <div key={image.id} className="glass rounded-xl overflow-hidden">
                 {/* Image Preview */}
-                <div className="aspect-video bg-gray-900 relative">
+                <div className="aspect-video bg-black/40 relative">
                   <img
                     src={image.url}
-                    alt={image.title}
+                    alt={image.title || "Submitted artwork"}
+                    loading="lazy"
                     className="w-full h-full object-contain"
                     onError={(e) => {
-                      e.currentTarget.src = 'placeholder.svg';
+                      e.currentTarget.src = '/placeholder.svg';
                     }}
                   />
                   <div className="absolute top-2 right-2">
@@ -252,8 +254,8 @@ const Check = () => {
                 {/* Image Details */}
                 <div className="p-4 space-y-2">
                   <h3 className="font-semibold text-lg">{image.title}</h3>
-                  <p className="text-gray-400">Student: {image.studentName}</p>
-                  <p className="text-gray-400">Grade: {image.grade}</p>
+                  <p className="text-gray-300">Student: {image.studentName}</p>
+                  <p className="text-gray-300">Grade: {image.grade}</p>
                   <p className="text-gray-400 text-sm">{image.timestamp}</p>
                   
                   {/* Action Buttons */}
@@ -281,9 +283,11 @@ const Check = () => {
               </div>
             ))}
             {displayedImages.length === 0 && (
-              <div className="col-span-full text-center py-12 bg-gray-800 rounded-lg">
-                <p className="text-gray-400">
-                  No images to display. Use the controls above to load images.
+              <div className="col-span-full text-center py-16 glass rounded-xl">
+                <Image className="w-10 h-10 text-primary mx-auto mb-3 opacity-80" />
+                <p className="text-gray-300 font-medium">No images to display</p>
+                <p className="text-gray-400 text-sm mt-1">
+                  Use the controls above to load submissions for review.
                 </p>
               </div>
             )}
