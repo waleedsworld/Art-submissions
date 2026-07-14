@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AlertCircle, CheckCircle, Upload, Filter, Image, Eye } from "lucide-react";
 
 const ApiTestPage = () => {
-  const [responses, setResponses] = useState<{ endpoint: string; response: any }[]>([]);
+  const [responses, setResponses] = useState<{ endpoint: string; response: unknown }[]>([]);
   const [loading, setLoading] = useState<string | null>(null);
   const [imageId, setImageId] = useState("");
   const [viewImageId, setViewImageId] = useState("");
@@ -15,7 +15,7 @@ const ApiTestPage = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const addResponse = (endpoint: string, response: any) => {
+  const addResponse = (endpoint: string, response: unknown) => {
     setResponses(prev => [{
       endpoint,
       response: typeof response === 'object' ? response : { data: response }

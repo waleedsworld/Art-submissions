@@ -28,9 +28,9 @@ const Check = () => {
   const [file, setFile] = useState<File | null>(null);
   const { toast } = useToast();
 
-  const processImageData = (data: any) => {
+  const processImageData = (data: Record<string, unknown> | Record<string, unknown>[]) => {
     if (Array.isArray(data)) {
-      return data.map(img => ({
+      return data.map((img: Record<string, unknown>) => ({
         id: img.id,
         ...parseImageData(img.datefield),
         timestamp: formatDate(img.timestamp),
