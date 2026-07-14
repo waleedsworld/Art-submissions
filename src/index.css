@@ -83,3 +83,28 @@
 .animate-fade-in {
   animation: fadeIn 0.8s ease-out forwards;
 }
+
+/* Respect users who prefer reduced motion: neutralise the ambient float,
+   fade-in and hover-scale animations without hiding any content. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-float {
+    animation: none !important;
+  }
+}
+
+/* A clearly visible keyboard focus ring for every interactive element,
+   using the brand accent so it reads on the dark studio backdrop. */
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
