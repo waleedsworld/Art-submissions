@@ -14,6 +14,8 @@
 
 **Art Submissions** is a warm, gallery-style web app for schools and clubs. Students submit their creations — **hand-drawn** or **AI-generated** — and a curator reviews each piece before it goes up on the public wall. It's fast, it's pretty, and it works beautifully on a phone in the back of art class.
 
+**Live demo:** deploying soon.
+
 <p align="center">
   <img src="assets/demo.gif" alt="Art Submissions — walkthrough" width="80%" />
   <br />
