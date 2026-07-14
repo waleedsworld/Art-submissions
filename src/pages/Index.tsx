@@ -6,6 +6,8 @@ import { Plus, Image, Star, Award, Rocket, CheckCircle, Wand2, ChevronLeft, Chev
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
 import { parseImageData } from "@/lib/utils";
+import { useExperiment } from "@/hooks/use-experiment";
+import { EXPERIMENTS } from "@/lib/experiments";
 import type { ImageRecord } from "@/types/api";
 import Footer from "@/components/Footer";
 import useEmblaCarousel from 'embla-carousel-react';
@@ -325,6 +327,10 @@ const Index = () => {
   const [showTypeDialog, setShowTypeDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const heroCta = useExperiment(EXPERIMENTS.heroCta);
+  const submitCtaLabel = heroCta.isVariant("showcase")
+    ? "Showcase Your Art"
+    : "Submit Your Artwork";
 
   // Feature: derive the visible collections from the live search query so every
   // gallery section reacts to the same search box.
@@ -408,13 +414,16 @@ const Index = () => {
             Discover and celebrate the artistic talent of our students through their creative expressions.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="bg-primary hover:bg-primary/90"
-              onClick={() => setShowTypeDialog(true)}
+              onClick={() => {
+                heroCta.convert({ goal: "submit_cta_click" });
+                setShowTypeDialog(true);
+              }}
             >
               <Plus className="mr-2" />
-              Submit Your Artwork
+              {submitCtaLabel}
             </Button>
             <a href="https://www.writecream.com/ai-image-generator-free-no-sign-up/" target="_blank" rel="noopener noreferrer">
               <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
